@@ -1,60 +1,174 @@
 <!DOCTYPE html>
 <html lang="de">
-
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ladungssicherungs-Rechner</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Ladungssicherungs-Rechner</title>
+
+<style>
+body {
+    font-family: Arial, sans-serif;
+    background: #f3f5f7;
+    padding: 20px;
+    max-width: 600px;
+    margin: auto;
+}
+
+h1 {
+    color: #17365d;
+}
+
+label {
+    display: block;
+    margin-top: 15px;
+    font-weight: bold;
+}
+
+input, select {
+    width: 100%;
+    padding: 12px;
+    margin-top: 5px;
+    box-sizing: border-box;
+}
+
+button {
+    background: #0078d4;
+    color: white;
+    border: none;
+    padding: 15px;
+    width: 100%;
+    margin-top: 25px;
+    font-size: 18px;
+    border-radius: 6px;
+}
+
+.ergebnis {
+    background: white;
+    padding: 20px;
+    margin-top: 25px;
+    border-radius: 8px;
+}
+</style>
 </head>
 
 <body>
 
-    <h1>Ladungssicherungs-Rechner</h1>
+<h1>Ladungssicherungs-Rechner</h1>
 
-    <p>Berechnung der erforderlichen Sicherungskraft.</p>
+<p>Demonstration einer vereinfachten Berechnung
+für das Niederzurren.</p>
 
-    <h2>Ladungsdaten</h2>
+<label>Ladungsgewicht (kg)</label>
+<input type="number" id="gewicht" value="1000" min="0">
 
-    <label for="gewicht">Gewicht der Ladung in kg:</label>
-    <input type="number" id="gewicht" placeholder="z. B. 1000">
+<label>Reibbeiwert</label>
+<select id="reibung">
+<option value="0.2">0,2</option>
+<option value="0.3">0,3</option>
+<option value="0.4">0,4</option>
+<option value="0.5">0,5</option>
+<option value="0.6" selected>0,6</option>
+</select>
 
-    <br><br>
+<label>Vorspannkraft STF (daN)</label>
+<input type="number" id="stf" value="350" min="1">
 
-    <label for="reibung">Reibbeiwert:</label>
-    <select id="reibung">
-        <option value="0.2">0,2</option>
-        <option value="0.3">0,3</option>
-        <option value="0.4">0,4</option>
-        <option value="0.5">0,5</option>
-        <option value="0.6">0,6</option>
-    </select>
+<label>Zurrwinkel (Grad)</label>
+<input type="number" id="winkel" value="75" min="1" max="90">
 
-    <br><br>
+<label>Bereits vorhandene Gurte</label>
+<input type="number" id="vorhanden" value="2" min="0">
 
-    <button onclick="berechnen()">Berechnen</button>
+<button onclick="berechnen()">Berechnen</button>
 
-    <h2>Ergebnis</h2>
+<div class="ergebnis" id="ergebnis">
+Noch keine Berechnung durchgeführt.
+</div>
 
-    <p id="ergebnis">Noch keine Berechnung durchgeführt.</p>
+<script>
+function berechnen() {
 
-    <script>
-        function berechnen() {
+    const gewicht = Number(
+        document.getElementById("gewicht").value
+    );
 
-            let gewicht = Number(document.getElementById("gewicht").value);
-            let reibung = Number(document.getElementById("reibung").value);
+    const reibung = Number(
+        document.getElementById("reibung").value
+    );
 
-            let erforderlicheSicherung = gewicht * (0.8 - reibung);
+    const stf = Number(
+        document.getElementById("stf").value
+    );
 
-            if (erforderlicheSicherung < 0) {
-                erforderlicheSicherung = 0;
-            }
+    const winkel = Number(
+        document.getElementById("winkel").value
+    );
 
-            document.getElementById("ergebnis").innerHTML =
-                "Erforderliche zusätzliche Sicherungskraft nach vorne: "
-                + erforderlicheSicherung.toFixed(0)
-                + " daN";
-        }
-    </script>
+    const vorhanden = Number(
+        document.getElementById("vorhanden").value
+    );
+
+    const ausgabe = document.getElementById("ergebnis");
+
+    if (
+        !Number.isFinite(gewicht) ||
+        gewicht <= 0 ||
+        !Number.isFinite(stf) ||
+        stf <= 0 ||
+        !Number.isFinite(winkel) ||
+        winkel <= 0 ||
+        winkel > 90 ||
+        !Number.isInteger(vorhanden) ||
+        vorhanden < 0
+    ) {
+        ausgabe.textContent =
+            "Bitte gültige Eingabewerte eingeben.";
+        return;
+    }
+
+    // Vereinfachtes Lernmodell, keine
+    // normgerechte Ladungssicherungsberechnung.
+
+    const sicherungskraft =
+        Math.max(0, gewicht * (0.8 - reibung));
+
+    const winkelRad = winkel * Math.PI / 180;
+
+    const kraftProGurt =
+        2 * stf * reibung * Math.sin(winkelRad);
+
+    const benoetigt = Math.ceil(
+        sicherungskraft / kraftProGurt
+    );
+
+    const zusaetzlich = Math.max(
+        0, benoetigt - vorhanden
+    );
+
+    ausgabe.innerHTML = `
+        <h2>Ergebnis (Lernmodell)</h2>
+
+        <p>Zusätzliche Sicherungskraft:
+        <strong>${sicherungskraft.toFixed(0)} daN</strong></p>
+
+        <p>Rechnerische Gurtanzahl:
+        <strong>${benoetigt}</strong></p>
+
+        <p>Vorhandene Gurte:
+        <strong>${vorhanden}</strong></p>
+
+        <h3>Rechnerisch zusätzlich:
+        ${zusaetzlich} Gurte</h3>
+
+        <p><small>
+        Achtung: Vereinfachtes Lernmodell.
+        Nicht zur praktischen Ladungssicherung
+        verwenden.
+        </small></p>
+    `;
+}
+</script>
 
 </body>
 </html>
