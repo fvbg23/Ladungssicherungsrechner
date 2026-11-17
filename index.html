@@ -27,21 +27,30 @@ label {
 
 input, select {
     width: 100%;
-    padding: 12px;
-    margin-top: 5px;
+    padding: 14px;
+    border: 1px solid #ccd5df;
+    border-radius: 8px;
+    background: white;
+    font-size: 16px;
     box-sizing: border-box;
 }
 
+input:focus, select:focus {
+    outline: 2px solid #2877bc;
+}
+
+
 button {
-    background: #0078d4;
+    background: #233f69;
     color: white;
     border: none;
     padding: 15px;
-    width: 100%;
-    margin-top: 25px;
+    border-radius: 8px;
     font-size: 18px;
-    border-radius: 6px;
+    font-weight: bold;
+    cursor: pointer;
 }
+
 
 .ergebnis {
     background: white;
@@ -57,7 +66,22 @@ button {
     height: auto;
     margin: 0 auto 25px auto;
 }
- 
+
+@media (max-width: 600px) {
+    body {
+        padding: 15px;
+    }
+
+    h1 {
+        font-size: 26px;
+    }
+
+    button {
+        width: 100%;
+    }
+}
+
+    
 </style>
 </head>
 
